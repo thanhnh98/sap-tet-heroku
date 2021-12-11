@@ -19,8 +19,8 @@ fun Application.module(testing: Boolean = false) {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
 
-        get("/json/gson") {
-            call.respond(mapOf("hello" to "world"))
+        get("/test") {
+            call.respond("Hello 4, test server deployment")
         }
     }
 }
