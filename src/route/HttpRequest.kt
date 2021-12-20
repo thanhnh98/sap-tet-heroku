@@ -29,19 +29,23 @@ fun joinRoom(roomId: Long? = null, connection: Connection): suspend DefaultWebSo
 }
 
 fun createRoom(connection: Connection): suspend DefaultWebSocketServerSession.() -> Unit =  {
-
-    val room: RoomModel = RoomModel()
-
-    val thisConnection = Connection(this)
-    println("Adding user into session: ${this.call.parameters.toString()}")
+    println("created room: into")
     try {
-        for (frame in incoming) {
-            frame as? Frame.Text ?: continue
-            connection.session.send(room.toString())
+        val room: RoomModel = RoomModel()
+        println("created room: ${room.roomId}")
+
+        val thisConnection = Connection(this)
+        try {
+            for (frame in incoming) {
+                frame as? Frame.Text ?: continue
+                connection.session.send(room.toString())
+            }
+        } catch (e: Exception) {
+            println(e.localizedMessage)
+        } finally {
+            println("Removing $thisConnection!")
         }
-    } catch (e: Exception) {
-        println(e.localizedMessage)
-    } finally {
-        println("Removing $thisConnection!")
+    }catch (e: java.lang.Exception){
+        println("exception: ${e.stackTrace}")
     }
 }

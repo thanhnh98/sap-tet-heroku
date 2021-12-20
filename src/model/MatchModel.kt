@@ -3,43 +3,47 @@ package com.tlife.model
 import java.lang.Exception
 
 data class MatchModel(
-    var playground: MutableList<MutableList<Boolean>> = mutableListOf(
-        mutableListOf(false, false, false),
-        mutableListOf(false, false, false),
-        mutableListOf(false, false, false),
+    var playground: MutableList<MutableList<String>> = mutableListOf(
+        mutableListOf("", "", ""),
+        mutableListOf("", "", ""),
+        mutableListOf("", "", ""),
     ),
     var isWon: Boolean = false
 ){
     fun checkIn(stepModel: StepModel): MatchModel{
+        if (stepModel.value.isEmpty())
+            return this
+
         playground[stepModel.x][stepModel.y] = stepModel.value
-        isWon = hadWonOnLastStep()
+        isWon = hadWonOnLastStep(stepModel)
         return this
     }
 
-    fun hadWonOnLastStep(): Boolean{
-       return validateColumn() || validateRow() || validateDiagonal()
+    fun hadWonOnLastStep(stepModel: StepModel): Boolean{
+       return validateColumn(stepModel.value) || validateRow(stepModel.value) || validateDiagonal(stepModel.value)
     }
 
-    private fun validateRow(): Boolean{
-        return (playground[0][0] && playground[0][1] && playground[0][2])
-                || (playground[1][0] && playground[1][1] && playground[1][2])
-                || (playground[2][0] && playground[2][1] && playground[2][2])
+    private fun validateRow(value: String): Boolean{
+        return (playground[0][0] == value && playground[0][1] == value && playground[0][2] == value)
+                || (playground[1][0] == value && playground[1][1] == value && playground[1][2] == value)
+                || (playground[2][0] == value && playground[2][1] == value && playground[2][2] == value)
     }
 
-    private fun validateColumn(): Boolean{
-        return (playground[0][0] && playground[1][0] && playground[2][0])
-                || (playground[0][1] && playground[1][1] && playground[2][1])
-                || (playground[0][2] && playground[1][2] && playground[2][2])
+    private fun validateColumn(value: String): Boolean{
+        return (playground[0][0] == value && playground[1][0] == value && playground[2][0] == value)
+                || (playground[0][1] == value && playground[1][1] == value && playground[2][1] == value)
+                || (playground[0][2] == value && playground[1][2] == value && playground[2][2] == value)
     }
 
-    private fun validateDiagonal(): Boolean{
-        return (playground[0][0] && playground[1][1] && playground[2][2])
-                || (playground[2][0] && playground[1][1] && playground[0][2])
+    private fun validateDiagonal(value: String): Boolean{
+        return (playground[0][0] == value && playground[1][1] == value && playground[2][2] == value)
+                || (playground[2][0] == value && playground[1][1] == value && playground[0][2] == value)
     }
 }
 
 data class StepModel(
     val x: Int,
     val y: Int,
-    var value: Boolean = false
+    var value: String = "",
+    val name: String
 )
