@@ -10,7 +10,7 @@ import io.ktor.sessions.*
 import io.ktor.websocket.*
 
 fun main() {
-    val isDev = true
+    val isDev = false
     embeddedServer(Netty, port = 8080, if (isDev) "127.0.0.1" else "192.168.0.97") {
         module()
     }.start(wait = true)
