@@ -35,11 +35,22 @@ fun Application.module(testing: Boolean = false) {
                 contentType = ContentType.Text.Plain)
         }
 
-        get("/app-config/{code}") {
+        get("/app-config/code/{code}") {
             val versioncode = this.call.request.call.parameters["code"]?.toInt()?:0
 
             appVersionModel = appVersionModel.copy(
                 lastVersionCode = versioncode
+            )
+            call.respondText(
+                Version(appVersionModel).toJson(),
+                contentType = ContentType.Text.Plain)
+        }
+
+        get("/app-config/force/{force}") {
+            val forceUpdate = this.call.request.call.parameters["force"]?.toBoolean()?:false
+
+            appVersionModel = appVersionModel.copy(
+                forceUpdate = forceUpdate
             )
             call.respondText(
                 Version(appVersionModel).toJson(),
