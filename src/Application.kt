@@ -10,7 +10,7 @@ import io.ktor.sessions.*
 import io.ktor.websocket.*
 
 fun main() {
-    val isDev = false
+    val isDev = true
     embeddedServer(Netty, port = 8080, if (isDev) "127.0.0.1" else "192.168.0.97") {
         module()
     }.start(wait = true)
@@ -19,10 +19,10 @@ fun main() {
 fun Application.module(testing: Boolean = false) {
     install(WebSockets)
     install(Sessions)
-    var appVersionModel = AppVersionModel(
-        324,
-        "3.2.4",
-        false
+    var appVersionModel = OkXeVersionModel(
+        false,
+        false,
+        "3.10.1"
     )
     routing {
         get("/") {
@@ -31,18 +31,22 @@ fun Application.module(testing: Boolean = false) {
 
         get("/app-config") {
             call.respondText(
-                Version(appVersionModel).toJson(),
+                OkxeModel(
+                    data = appVersionModel
+                ).toJson(),
                 contentType = ContentType.Text.Plain)
         }
 
         get("/app-config/code/{code}") {
-            val versioncode = this.call.request.call.parameters["code"]?.toInt()?:0
+            val versioncode = this.call.request.call.parameters["code"]?.toString()?:""
 
             appVersionModel = appVersionModel.copy(
-                lastVersionCode = versioncode
+                lastest_version = versioncode
             )
             call.respondText(
-                Version(appVersionModel).toJson(),
+                OkxeModel(
+                    data = appVersionModel
+                ).toJson(),
                 contentType = ContentType.Text.Plain)
         }
 
@@ -50,10 +54,25 @@ fun Application.module(testing: Boolean = false) {
             val forceUpdate = this.call.request.call.parameters["force"]?.toBoolean()?:false
 
             appVersionModel = appVersionModel.copy(
-                forceUpdate = forceUpdate
+                force_update = forceUpdate
             )
             call.respondText(
-                Version(appVersionModel).toJson(),
+                OkxeModel(
+                    data = appVersionModel
+                ).toJson(),
+                contentType = ContentType.Text.Plain)
+        }
+
+        get("/app-config/recommended/{recommended}") {
+            val recommended = this.call.request.call.parameters["recommended"]?.toBoolean()?:false
+
+            appVersionModel = appVersionModel.copy(
+                recommend_update = recommended
+            )
+            call.respondText(
+                OkxeModel(
+                    data = appVersionModel
+                ).toJson(),
                 contentType = ContentType.Text.Plain)
         }
     }
@@ -67,4 +86,16 @@ data class AppVersionModel(
 
 data class Version(
     val version: AppVersionModel
+)
+
+data class OkxeModel(
+    val result: String = "ok",
+    val result_code: Int = 1,
+    val data: OkXeVersionModel
+)
+
+data class OkXeVersionModel(
+    val force_update: Boolean,
+    val recommend_update: Boolean,
+    val lastest_version: String
 )
