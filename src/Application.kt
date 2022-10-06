@@ -37,42 +37,51 @@ fun Application.module(testing: Boolean = false) {
                 contentType = ContentType.Text.Plain)
         }
 
-        get("/app-config/code/{code}") {
-            val versioncode = this.call.request.call.parameters["code"]?.toString()?:""
+        get("/app-config/update") {
+            val recommended = this.call.request.queryParameters["recommended"]?.toBoolean()
+            val forceUpdate = this.call.request.call.parameters["force"]?.toBoolean()
+            val versioncode = this.call.request.call.parameters["code"]?.toString()
 
-            appVersionModel = appVersionModel.copy(
-                lastest_version = versioncode
-            )
+            recommended?.apply {
+                appVersionModel = appVersionModel.copy(
+                    recommend_update = this
+                )
+            }
+
+            forceUpdate?.apply {
+                appVersionModel.copy(
+                    force_update = this
+                )
+            }
+
+            versioncode?.apply {
+                appVersionModel.copy(
+                    lastest_version = this
+                )
+            }
+
             call.respondText(
                 OkxeModel(
-                    data = appVersionModel
+                    data = appVersionModel,
                 ).toJson(),
                 contentType = ContentType.Text.Plain)
         }
 
-        get("/app-config/force/{force}") {
-            val forceUpdate = this.call.request.call.parameters["force"]?.toBoolean()?:false
-
-            appVersionModel = appVersionModel.copy(
-                force_update = forceUpdate
-            )
+        get("/feature-flag") {
+            val versioncode = this.call.request.call.parameters["in-app"]?.toBoolean()?:false
             call.respondText(
-                OkxeModel(
-                    data = appVersionModel
-                ).toJson(),
-                contentType = ContentType.Text.Plain)
-        }
-
-        get("/app-config/recommended/{recommended}") {
-            val recommended = this.call.request.call.parameters["recommended"]?.toBoolean()?:false
-
-            appVersionModel = appVersionModel.copy(
-                recommend_update = recommended
-            )
-            call.respondText(
-                OkxeModel(
-                    data = appVersionModel
-                ).toJson(),
+                "{\n" +
+                        "\"success\": true,\n" +
+                        "\"result_code\": 1,\n" +
+                        "\"result\": \"Ok\",\n" +
+                        "\"data\": {\n" +
+                            "\"feature_flags\": {\n" +
+                            "\"module-insurance\": true,\n" +
+                            "\"module-cash-loan\": true,\n" +
+                            "\"module-in-app-update\": $versioncode\n" +
+                        "}\n" +
+                        "}\n" +
+                    "}",
                 contentType = ContentType.Text.Plain)
         }
     }
