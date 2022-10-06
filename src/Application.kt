@@ -24,6 +24,8 @@ fun Application.module(testing: Boolean = false) {
         false,
         "3.10.1"
     )
+    var enable_in_app = false
+
     routing {
         get("/") {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
@@ -68,7 +70,12 @@ fun Application.module(testing: Boolean = false) {
         }
 
         get("/feature-flag") {
-            val versioncode = this.call.request.call.parameters["in-app"]?.toBoolean()?:false
+            val enableInApp = this.call.request.call.parameters["in-app"]?.toBoolean()
+
+            enableInApp?.apply {
+                enable_in_app = this
+            }
+
             call.respondText(
                 "{\n" +
                         "\"success\": true,\n" +
@@ -78,7 +85,7 @@ fun Application.module(testing: Boolean = false) {
                             "\"feature_flags\": {\n" +
                             "\"module-insurance\": true,\n" +
                             "\"module-cash-loan\": true,\n" +
-                            "\"module-in-app-update\": $versioncode\n" +
+                            "\"module-in-app-update\": $enable_in_app\n" +
                         "}\n" +
                         "}\n" +
                     "}",
