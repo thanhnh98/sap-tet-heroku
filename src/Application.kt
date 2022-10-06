@@ -38,9 +38,9 @@ fun Application.module(testing: Boolean = false) {
         }
 
         get("/app-config/update") {
-            val recommended = this.call.request.queryParameters["recommended"]?.toBoolean()
-            val forceUpdate = this.call.request.call.parameters["force"]?.toBoolean()
-            val versioncode = this.call.request.call.parameters["code"]?.toString()
+            val recommended = this.call.request.queryParameters["recommend_update"]?.toBoolean()
+            val forceUpdate = this.call.request.call.parameters["force_update"]?.toBoolean()
+            val versioncode = this.call.request.call.parameters["lastest_version"]?.toString()
 
             recommended?.apply {
                 appVersionModel = appVersionModel.copy(
@@ -49,13 +49,13 @@ fun Application.module(testing: Boolean = false) {
             }
 
             forceUpdate?.apply {
-                appVersionModel.copy(
+                appVersionModel = appVersionModel.copy(
                     force_update = this
                 )
             }
 
             versioncode?.apply {
-                appVersionModel.copy(
+                appVersionModel = appVersionModel.copy(
                     lastest_version = this
                 )
             }
